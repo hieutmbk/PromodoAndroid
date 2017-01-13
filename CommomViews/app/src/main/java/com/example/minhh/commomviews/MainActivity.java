@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.toString();
+    private static final String TAG =  MainActivity.class.toString();
     private ImageView imv1;
     private Spinner spFruit;
     private EditText etSimple;
@@ -49,6 +49,49 @@ public class MainActivity extends AppCompatActivity {
         addListeners();
     }
 
+    public void getReferences() {
+        imv1 = (ImageView) findViewById(R.id.imv1);
+        spFruit = (Spinner) findViewById(R.id.sp_fruit);
+        etSimple = (EditText) findViewById(R.id.et_simple);
+        btnTest = (Button) findViewById(R.id.btn_test);
+        cbFA = (CheckBox) findViewById(R.id.chFA);
+
+        rbMale = (RadioButton) findViewById(R.id.rbMale);
+        rbFemale = (RadioButton) findViewById(R.id.rbFemale);
+        rbUndefined = (RadioButton) findViewById(R.id.rb_undefined);
+
+        rtbSimple = (RatingBar) findViewById(R.id.rtb_simple);
+        sbSimple = (SeekBar) findViewById(R.id.sb_simple);
+        tvSeekBarProgress = (TextView) findViewById(R.id.tv_seekbar_progress);
+        svSimple = (SearchView) findViewById(R.id.sv_simpe);
+        pbSimple = (ProgressBar) findViewById(R.id.pb_simple);
+    }
+
+    private void setupUI() {
+        imv1.setImageResource(R.drawable.anh1);
+
+        String[] fruits =  new String[] {
+                "Apple",
+                "Orange",
+                "Kiwi",
+                "Pinaple"
+        };
+
+        ArrayAdapter<String> fruitArrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                fruits
+        );
+
+        spFruit.setAdapter(fruitArrayAdapter);
+        spFruit.post(new Runnable() {
+            @Override
+            public void run() {
+                spFruit.setSelection(2);
+            }
+        });
+        rbMale.setChecked(true);
+    }
     private void addListeners() {
         spFruit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -109,20 +152,17 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        cbFA.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG,String.format("cbFA.onCheckedChanged : %s",isChecked));
+            }
+        });
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Read
-                Log.d(TAG,String.format("%s:%s",cbFA.isChecked() ));
-                //Write
                 cbFA.setChecked(!cbFA.isChecked());
-                //
-                Log.d(TAG,rbMale.isChecked()?"Male":rbFemale.isChecked()?"Female":"Undefined");
-
-                Log.d(TAG,String.format("rating %s",rtbSimple.getRating()));
-                //SeekBar Read
-                Log.d(TAG,String.format("seekbar : %s",sbSimple.getProgress()));
-
                 sbSimple.setProgress(sbSimple.getProgress() + 10);
 
                 svSimple.clearFocus();
@@ -132,55 +172,5 @@ public class MainActivity extends AppCompatActivity {
                 pbSimple.setProgress(pbSimple.getProgress() + 10);
             }
         });
-        cbFA.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG,String.format("cbFA.onCheckedChanged : %s",isChecked));
-            }
-        });
-    }
-
-    public void getReferences() {
-        imv1 = (ImageView) findViewById(R.id.imv1);
-        spFruit = (Spinner) findViewById(R.id.sp_fruit);
-        etSimple = (EditText) findViewById(R.id.et_simple);
-        btnTest = (Button) findViewById(R.id.btn_test);
-        cbFA = (CheckBox) findViewById(R.id.chFA);
-
-        rbMale = (RadioButton) findViewById(R.id.rbMale);
-        rbFemale = (RadioButton) findViewById(R.id.rbFemale);
-        rbUndefined = (RadioButton) findViewById(R.id.rb_undefined);
-
-        rtbSimple = (RatingBar) findViewById(R.id.rtb_simple);
-        sbSimple = (SeekBar) findViewById(R.id.sb_simple);
-        tvSeekBarProgress = (TextView) findViewById(R.id.tv_seekbar_progress);
-        svSimple = (SearchView) findViewById(R.id.sv_simpe);
-        pbSimple = (ProgressBar) findViewById(R.id.pb_simple);
-    }
-
-    private void setupUI() {
-        imv1.setImageResource(R.drawable.anh1);
-
-        String[] fruits =  new String[] {
-                "Apple",
-                "Orange",
-                "Kiwi",
-                "Pinaple"
-        };
-
-        ArrayAdapter<String> fruitArrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                fruits
-        );
-
-        spFruit.setAdapter(fruitArrayAdapter);
-        spFruit.post(new Runnable() {
-            @Override
-            public void run() {
-                spFruit.setSelection(2);
-            }
-        });
-        rbMale.setChecked(true);
     }
 }
