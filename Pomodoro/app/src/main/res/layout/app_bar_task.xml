@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activities.TaskActivity">
+    tools:context="techkids.vn.android7pomodoro.activities.TaskActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -29,6 +29,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@android:drawable/ic_dialog_email" />
+
+    <Button
+        android:text="Setting"
+        android:layout_width="104dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_setting"
+        app:layout_anchorGravity="top|center_horizontal"
+        android:layout_gravity="center_vertical|center_horizontal" />
+
 
 </android.support.design.widget.CoordinatorLayout>
