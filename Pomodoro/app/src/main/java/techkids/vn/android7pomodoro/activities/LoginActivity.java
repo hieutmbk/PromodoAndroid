@@ -13,7 +13,20 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.R;
+import techkids.vn.android7pomodoro.networks.Jsonmodels.LoginBodyJson;
+import techkids.vn.android7pomodoro.networks.Jsonmodels.LoginResponseJson;
+import techkids.vn.android7pomodoro.networks.Jsonmodels.RegisterBodyJson;
+import techkids.vn.android7pomodoro.networks.Jsonmodels.RegisterResponseJson;
+import techkids.vn.android7pomodoro.networks.services.LoginService;
+import techkids.vn.android7pomodoro.networks.services.RegisterService;
 import techkids.vn.android7pomodoro.settings.LoginCredentials;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
@@ -24,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btRegister;
     private Button btLogin;
+    private Retrofit retrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +58,79 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+        btRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attempRegister();
+            }
+        });
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("setting",MODE_PRIVATE);
+    }
 
-        SharedPrefs sharedPrefs = new SharedPrefs(this);
-        sharedPrefs.put(new LoginCredentials("hieu","xxxx!"));
-        Log.d(TAG, String.format("onCreate: %s",sharedPrefs.getLoginCredentials().toString() ));
+
+    private void sendRegister(String username,String password){
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://a-task.herokuapp.com/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RegisterService registerService = retrofit.create(RegisterService.class);
+        MediaType jsonMediaType = MediaType.parse("application/json");
+        final String registerJson = (new Gson().toJson(new RegisterBodyJson(username,password)));
+        RequestBody requestBody = RequestBody.create(jsonMediaType,registerJson);
+
+        registerService.register(requestBody)
+                .enqueue(new Callback<RegisterResponseJson>() {
+                    @Override
+                    public void onResponse(Call<RegisterResponseJson> call, Response<RegisterResponseJson> response) {
+                        RegisterResponseJson registerResponseJson = response.body();
+                        if(registerResponseJson == null){
+                            if(response.code() == 400){
+                                Log.d(TAG,"*************  Tài khoản đã tồn tại  *********************");
+                            }else {
+                                Log.d(TAG,"Register fail");
+                            }
+                        }else if(response.code() == 200){
+                            Log.d(TAG,"************  Đăng kí thành công  *********************");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RegisterResponseJson> call, Throwable t) {
+                        Log.d(TAG,String.format("onFailure %s",t));
+                    }
+                });
+    }
+    private void sendLogin(String username,String password){
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://a-task.herokuapp.com/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        LoginService loginService = retrofit.create(LoginService.class);
+        MediaType jsonMediaType  = MediaType.parse("application/json");
+        String loginJson = (new  Gson().toJson(new LoginBodyJson(username,password)));
+        RequestBody loginBody = RequestBody.create(jsonMediaType,loginJson);
+
+        loginService.login(loginBody)
+                .enqueue(new Callback<LoginResponseJson>() {
+                    @Override
+                    public void onResponse(Call<LoginResponseJson> call, Response<LoginResponseJson> response) {
+                        LoginResponseJson loginResponseJson = response.body();
+                        if(loginResponseJson == null){
+                            Log.d(TAG,"onResponse: Could not parse body");
+                        }else {
+                            Log.d(TAG, String.format("onResponse, oh yeah %s", loginResponseJson));
+                            if(response.code() == 200) {
+                                onLoginSuccess();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<LoginResponseJson> call, Throwable t) {
+                        Log.d(TAG,String.format("onFailure %s",t));
+                    }
+                });
+
     }
 
     private void skipLoginIfPossible() {
@@ -57,18 +138,32 @@ public class LoginActivity extends AppCompatActivity {
             gotoTaskActivity();
         }
     }
-
-    private void attemptLogin() {
-        String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
-
-        if (username.equals("admin") && password.equals("admin")) {
-            // Notifications
-            SharedPrefs.getInstance().put(new LoginCredentials(username,password));
+    private  void onLoginSuccess(){
+        SharedPrefs.getInstance().put(new LoginCredentials(username,password));
             Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show();
             gotoTaskActivity();
 
-        }else Toast.makeText(this, "Tên đăng nhập hoặc mật khẩu sai", Toast.LENGTH_SHORT).show();
+    }
+    private String username;
+    private String password;
+    private void attemptLogin() {
+        username = etUsername.getText().toString();
+        password = etPassword.getText().toString();
+
+        sendLogin(username,password);
+
+//        if (username.equals("admin") && password.equals("admin")) {
+//            // Notifications
+//
+//
+//        }else Toast.makeText(this, "Tên đăng nhập hoặc mật khẩu sai", Toast.LENGTH_SHORT).show();
+    }
+
+    private void attempRegister() {
+        username = etUsername.getText().toString();
+        password = etPassword.getText().toString();
+
+        sendRegister(username,password);
     }
     private  void gotoTaskActivity(){
         Intent intent = new Intent(this,TaskActivity.class);
