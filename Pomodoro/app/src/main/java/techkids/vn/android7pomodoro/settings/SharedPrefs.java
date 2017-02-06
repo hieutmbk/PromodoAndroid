@@ -48,4 +48,11 @@ public class SharedPrefs {
         LoginCredentials loginCredentials = gson.fromJson(loginJSON,LoginCredentials.class);
         return loginCredentials;
     }
+    public String getAccessToken(){
+        LoginCredentials loginCredentials = getLoginCredentials();
+        if(loginCredentials != null){
+            return getAccessToken();
+        }
+        return null;
+    }
 }

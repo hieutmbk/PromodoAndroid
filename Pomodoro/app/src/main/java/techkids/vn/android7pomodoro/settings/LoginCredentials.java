@@ -7,10 +7,20 @@ package techkids.vn.android7pomodoro.settings;
 public class LoginCredentials {
     private String username;
     private String password;
+    private String accsessToken;
 
-    public LoginCredentials(String username, String password) {
+    public LoginCredentials(String username, String password, String accsessToken) {
         this.username = username;
         this.password = password;
+        this.accsessToken = accsessToken;
+    }
+
+    public String getAccsessToken() {
+        return accsessToken;
+    }
+
+    public void setAccsessToken(String accsessToken) {
+        this.accsessToken = accsessToken;
     }
 
     public String getUsername() {
@@ -29,4 +39,12 @@ public class LoginCredentials {
         this.password = password;
     }
 
+    @Override
+    public String toString() {
+        return "LoginCredentials{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", accsessToken='" + accsessToken + '\'' +
+                '}';
+    }
 }

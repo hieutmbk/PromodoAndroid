@@ -1,37 +1,16 @@
-package techkids.vn.android7pomodoro.networks.Jsonmodels;
+package techkids.vn.android7pomodoro.networks.jsonmodels;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by minhh on 20/01/2017.
+ * Created by minhh on 18/01/2017.
  */
 
 public class LoginResponseJson {
-    @SerializedName("code")
-    private int code;
-    @SerializedName("message")
-    private String message;
-    @SerializedName("token")
-    private String token;
+    @SerializedName("access_token")
+    private String accsessToken;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    @Override
-    public String toString() {
-        return "LoginResponseJson{" +
-                "code=" + code +
-                ", message='" + message + '\'' +
-                ", token='" + token + '\'' +
-                '}';
+    public String getAccsessToken() {
+        return accsessToken;
     }
 }

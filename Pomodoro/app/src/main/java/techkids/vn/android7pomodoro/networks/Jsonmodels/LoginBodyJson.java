@@ -1,9 +1,9 @@
-package techkids.vn.android7pomodoro.networks.Jsonmodels;
+package techkids.vn.android7pomodoro.networks.jsonmodels;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by minhh on 20/01/2017.
+ * Created by minhh on 18/01/2017.
  */
 
 public class LoginBodyJson {
@@ -11,11 +11,6 @@ public class LoginBodyJson {
     private String username;
     @SerializedName("password")
     private String password;
-
-    public LoginBodyJson(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
     public String getUsername() {
         return username;
@@ -30,6 +25,11 @@ public class LoginBodyJson {
     }
 
     public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LoginBodyJson(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 
