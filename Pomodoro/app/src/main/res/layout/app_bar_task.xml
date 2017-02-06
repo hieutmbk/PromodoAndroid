@@ -31,13 +31,4 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
-    <Button
-        android:text="Setting"
-        android:layout_width="104dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_setting"
-        app:layout_anchorGravity="top|center_horizontal"
-        android:layout_gravity="center_vertical|center_horizontal" />
-
-
 </android.support.design.widget.CoordinatorLayout>
