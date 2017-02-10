@@ -3,6 +3,9 @@ package techkids.vn.android7pomodoro.activities;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,11 +15,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
+import android.widget.ListAdapter;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import techkids.vn.android7pomodoro.R;
+import techkids.vn.android7pomodoro.adapters.TaskAdapter;
 
 public class TaskActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    @BindView(R.id.rv_task)
+    RecyclerView rvTask;
+
+
+    private TaskAdapter taskAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +55,18 @@ public class TaskActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+        setupUI();
+    }
+    private void setupUI() {
+        ButterKnife.bind(this);
+        taskAdapter = new TaskAdapter();
+
+        rvTask.setAdapter(taskAdapter);
+        //grTask.setAdapter((ListAdapter) taskAdapter);
+        rvTask.setLayoutManager(new GridLayoutManager(this,3));
     }
 
     @Override

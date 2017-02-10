@@ -3,6 +3,8 @@ package techkids.vn.android7pomodoro;
 import android.app.Application;
 import android.util.Log;
 
+import techkids.vn.android7pomodoro.databases.DbContext;
+import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
 /**
@@ -17,5 +19,9 @@ public class PomodoroApplication extends Application {
         super.onCreate();
         Log.d(TAG, String.format("onCreate "));
         SharedPrefs.init(this);
+
+        for(Task task : DbContext.instance.allTask()){
+            Log.d(TAG,String.format("onCreate: %s",task));
+        }
     }
 }

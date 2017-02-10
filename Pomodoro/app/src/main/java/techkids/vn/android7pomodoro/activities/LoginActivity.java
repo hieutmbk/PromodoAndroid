@@ -1,10 +1,12 @@
 package techkids.vn.android7pomodoro.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -45,11 +49,12 @@ public class LoginActivity extends AppCompatActivity {
         private String password;
         private String token;
 
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            //skipLoginIfPossible();
+           // skipLoginIfPossible();
 
             setContentView(R.layout.activity_login);
 
@@ -61,7 +66,25 @@ public class LoginActivity extends AppCompatActivity {
             btLogin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+                    progressDialog.setMessage("Please wait data is Processing");
+                    progressDialog.show();
+//        After 2 Seconds i dismiss progress Dialog
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            super.run();
+                            try {
+                                Thread.sleep(2000);
+                                if (progressDialog.isShowing())
+                                    progressDialog.dismiss();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
                     attemptLogin();
+
                 }
             });
 
@@ -77,9 +100,30 @@ public class LoginActivity extends AppCompatActivity {
                     return false;
                 }
             });
+            setupUI();
         }
 
-        private void sendLogin(String username, String password) {
+    private void setupUI() {
+        etUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(etUsername.getText().length() == 0){
+                    etUsername.setError("Tên đăng nhập không để trống");
+                }
+            }
+        });
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(etPassword.getText().length() == 0){
+                    etPassword.setError("Mật khẩu không để trống");
+                }
+            }
+        });
+    }
+
+
+    private void sendLogin(String username, String password) {
             //1 : Create retrofit (BaseURL)
             retrofit = new Retrofit.Builder()
                     .baseUrl("http://a-task.herokuapp.com/api/")
@@ -102,10 +146,12 @@ public class LoginActivity extends AppCompatActivity {
 
             loginCall.enqueue(new Callback<LoginResponseJson>() {
                 @Override
-                public void onResponse(Call<LoginResponseJson> call, Response<LoginResponseJson> response) {
+                public void onResponse(Call<LoginResponseJson> call, final Response<LoginResponseJson> response) {
                     LoginResponseJson loginResponseJson = response.body();
                     if (loginResponseJson == null) {
                         Log.d(TAG, "onResponse: Could not parse body");
+
+                        etUsername.setError("Tên đăng nhập hoặc mật khẩu sai");
                     } else {
                         Log.d(TAG, String.format("onResponse, oh yeah: %s", loginResponseJson));
                         if (response.code() == 200) {
@@ -118,6 +164,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<LoginResponseJson> call, Throwable t) {
                     Log.d(TAG, String.format("onFailure: %s", t));
+
                 }
             });
         }
