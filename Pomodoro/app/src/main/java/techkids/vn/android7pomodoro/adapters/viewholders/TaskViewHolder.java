@@ -23,6 +23,8 @@ public class TaskViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.tv_task_name)
     TextView tvTaskName;
+
+    boolean selected = false;
     public TaskViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
@@ -35,8 +37,16 @@ public class TaskViewHolder extends RecyclerView.ViewHolder {
         ivTaskColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ivTaskColor.setImageResource(R.drawable.ic_check);
+                if(selected == false){
+                    ivTaskColor.setImageResource(R.drawable.ic_check);
+                    selected = true;
+                }
+                else {
+                    selected = false;
+                    ivTaskColor.setImageResource(R.color.colorTransparent);
+                }
             }
+
         });
         //2: Bind task name
         tvTaskName.setText(task.getName());
