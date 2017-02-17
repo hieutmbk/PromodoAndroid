@@ -7,7 +7,7 @@ import retrofit2.http.POST;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginResponseJson;
 
 /**
- * Created by minhh on 18/01/2017.
+ * Created by apple on 1/18/17.
  */
 
 public interface LoginService {

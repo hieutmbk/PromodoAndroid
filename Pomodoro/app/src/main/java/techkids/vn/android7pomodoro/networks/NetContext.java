@@ -4,12 +4,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by minhh on 18/01/2017.
+ * Created by apple on 1/18/17.
  */
 
 public class NetContext {
-    public Retrofit retrofit;
-    public NetContext(){
+    private Retrofit retrofit;
+
+    public NetContext() {
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://a-task.herokuapp.com/api/")
                 .addConverterFactory(GsonConverterFactory.create())

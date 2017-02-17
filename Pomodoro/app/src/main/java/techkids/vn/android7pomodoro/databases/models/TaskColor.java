@@ -1,28 +1,50 @@
 package techkids.vn.android7pomodoro.databases.models;
 
 /**
- * Created by minhh on 13/02/2017.
+ * Created by huynq on 2/15/17.
  */
 
 public class TaskColor {
-    private String color;
 
-    public TaskColor(String color) {
-        this.color = color;
+    private String colorString;
+    private boolean isChecked;
+
+    public TaskColor(String colorString, boolean isChecked) {
+        this.colorString = colorString;
+        this.isChecked = isChecked;
     }
 
-    public String getColor() {
-        return color;
+    public String getColorString() {
+        return colorString;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setColorString(String colorString) {
+        this.colorString = colorString;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 
     @Override
     public String toString() {
         return "TaskColor{" +
-                "color='" + color + '\'' +
+                "isChecked=" + isChecked +
+                ", colorString='" + colorString + '\'' +
                 '}';
     }
+
+    public static String[] COLORS = new String[] {
+            "#0091EA",
+            "#00C853",
+            "#FFD600",
+            "#DD2C00",
+            "#AA00FF",
+            "#757575",
+            "#F50057"
+    };
 }

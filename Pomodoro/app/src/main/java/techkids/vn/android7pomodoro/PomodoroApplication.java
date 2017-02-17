@@ -8,20 +8,21 @@ import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
 /**
- * Created by minhh on 14/01/2017.
+ * Created by apple on 1/14/17.
  */
 
 public class PomodoroApplication extends Application {
-    private static final String TAG = PomodoroApplication.class.toString();
+
+    private static final String TAG = "PomodoroApplication";
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, String.format("onCreate "));
+        Log.d(TAG, "onCreate: ");
         SharedPrefs.init(this);
 
-        for(Task task : DbContext.instance.allTask()){
-            Log.d(TAG,String.format("onCreate: %s",task));
+        for (Task task : DbContext.instance.allTasks()) {
+            Log.d(TAG, String.format("onCreate: %s", task));
         }
     }
 }

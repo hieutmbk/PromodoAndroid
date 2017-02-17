@@ -1,26 +1,24 @@
 package techkids.vn.android7pomodoro.settings;
 
 /**
- * Created by minhh on 14/01/2017.
+ * Created by apple on 1/14/17.
  */
 
 public class LoginCredentials {
+
     private String username;
     private String password;
-    private String accsessToken;
+    private String accessToken;
 
-    public LoginCredentials(String username, String password, String accsessToken) {
+//    public LoginCredentials(String username, String password) {
+//        this.username = username;
+//        this.password = password;
+//    }
+
+    public LoginCredentials(String username, String password, String accessToken) {
         this.username = username;
         this.password = password;
-        this.accsessToken = accsessToken;
-    }
-
-    public String getAccsessToken() {
-        return accsessToken;
-    }
-
-    public void setAccsessToken(String accsessToken) {
-        this.accsessToken = accsessToken;
+        this.accessToken = accessToken;
     }
 
     public String getUsername() {
@@ -39,12 +37,20 @@ public class LoginCredentials {
         this.password = password;
     }
 
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     @Override
     public String toString() {
         return "LoginCredentials{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", accsessToken='" + accsessToken + '\'' +
+                ", accessToken='" + accessToken + '\'' +
                 '}';
     }
 }

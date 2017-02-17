@@ -3,14 +3,14 @@ package techkids.vn.android7pomodoro.networks.jsonmodels;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by minhh on 18/01/2017.
+ * Created by apple on 1/18/17.
  */
 
 public class LoginResponseJson {
     @SerializedName("access_token")
-    private String accsessToken;
+    private String accessToken;
 
-    public String getAccsessToken() {
-        return accsessToken;
+    public String getAccessToken() {
+        return accessToken;
     }
 }

@@ -4,51 +4,44 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.databases.models.Task;
+import techkids.vn.android7pomodoro.utils.Utils;
 
 /**
- * Created by minhh on 08/02/2017.
+ * Created by huynq on 2/8/17.
  */
 
 public class TaskViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.v_task_color)
-    ImageView ivTaskColor;
+    View vTaskColor;
 
     @BindView(R.id.tv_task_name)
     TextView tvTaskName;
+    @BindView(R.id.ibt_timer)
+    ImageButton ibtTimer;
 
-    boolean selected = false;
     public TaskViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this,itemView);
+        ButterKnife.bind(this, itemView);
     }
-    public void bind(Task task){
-        //1: bind color
-       // vTaskColor.setBackgroundColor(Color.parseColor(task.getColor()));
-        final GradientDrawable drawable = (GradientDrawable)ivTaskColor.getBackground();
-        drawable.setColor(Color.parseColor(task.getColor()));
-        ivTaskColor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(selected == false){
-                    ivTaskColor.setImageResource(R.drawable.ic_check);
-                    selected = true;
-                }
-                else {
-                    selected = false;
-                    ivTaskColor.setImageResource(R.color.colorTransparent);
-                }
-            }
 
-        });
-        //2: Bind task name
+    public void bind(Task task) {
+        //1: Bind Color
+//        vTaskColor.setBackgroundColor(Color.parseColor(task.getColor()));
+        Utils.setSolidColor(vTaskColor, task.getColor());
+
+        //2: Bind Task name
         tvTaskName.setText(task.getName());
+    }
+
+    public ImageButton getIbtTimer() {
+        return ibtTimer;
     }
 }

@@ -9,18 +9,38 @@ import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.adapters.viewholders.TaskViewHolder;
 import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
+import techkids.vn.android7pomodoro.fragments.TaskTimerFragment;
 
 /**
- * Created by minhh on 08/02/2017.
+ * Created by huynq on 2/8/17.
  */
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder>{
+public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
+
+    public interface TaskItemClickListener {
+        void onItemClick(Task task);
+    }
+    public interface  TaskTimerClickListener{
+        void onTimerClick(Task task);
+    }
+    private TaskTimerClickListener taskTimerClickListener;
+    private TaskItemClickListener taskItemClickListener;
+
+    public void setTaskTimerClickListener(TaskTimerClickListener taskTimerClickListener) {
+        this.taskTimerClickListener = taskTimerClickListener;
+    }
+
+    public void setTaskItemClickListener(TaskItemClickListener taskItemClickListener) {
+        this.taskItemClickListener = taskItemClickListener;
+    }
+
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-         //1: Create View
+        //1: Create View
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        View itemView = layoutInflater.inflate(R.layout.item_task,parent,false);
-        //2:Create ViewHolder
+        View itemView = layoutInflater.inflate(R.layout.item_task, parent, false);
+
+        //2: Create ViewHolder
         TaskViewHolder taskViewHolder = new TaskViewHolder(itemView);
         return taskViewHolder;
     }
@@ -28,13 +48,32 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder>{
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
         //1: Get data based on position
-        Task task = DbContext.instance.allTask().get(position);
+        final Task task = DbContext.instance.allTasks().get(position);
+
         //2: Bind data into view
         holder.bind(task);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // send event to outside
+                if (taskItemClickListener != null) {
+                    taskItemClickListener.onItemClick(task);
+                }
+            }
+        });
+        holder.getIbtTimer().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(taskItemClickListener != null){
+                    taskTimerClickListener.onTimerClick(task);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return DbContext.instance.allTask().size();
+        return DbContext.instance.allTasks().size();
     }
 }
