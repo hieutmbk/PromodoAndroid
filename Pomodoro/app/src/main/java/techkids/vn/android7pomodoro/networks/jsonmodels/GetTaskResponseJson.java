@@ -1,28 +1,23 @@
-package techkids.vn.android7pomodoro.databases.models;
+package techkids.vn.android7pomodoro.networks.jsonmodels;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by huynq on 2/8/17.
+ * Created by minhh on 21/02/2017.
  */
 
-public class Task {
+public class GetTaskResponseJson {
+    @SerializedName("name")
     private String name;
+    @SerializedName("color")
     private String color;
+    @SerializedName("payment_per_hour")
     private float paymentPerHour;
-    private boolean isDone;
 
-    public Task(String name, String color) {
-        this.name = name;
-        this.color = color;
-        this.isDone = false;
-    }
-
-    public Task(String name, String color, float paymentPerHour) {
+    public GetTaskResponseJson(String name, String color, float paymentPerHour) {
         this.name = name;
         this.color = color;
         this.paymentPerHour = paymentPerHour;
-        this.isDone = false;
     }
 
     public String getName() {
@@ -49,23 +44,12 @@ public class Task {
         this.paymentPerHour = paymentPerHour;
     }
 
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        isDone = done;
-    }
-
-    public void flipDone() {
-        isDone = !isDone;
-    }
-
     @Override
     public String toString() {
-        return "Task{" +
+        return "GetTaskResponseJson{" +
                 "name='" + name + '\'' +
                 ", color='" + color + '\'' +
+                ", paymentPerHour=" + paymentPerHour +
                 '}';
     }
 }

@@ -17,7 +17,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.util.List;
+
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,8 +31,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.R;
+import techkids.vn.android7pomodoro.databases.DbContext;
+import techkids.vn.android7pomodoro.databases.models.Task;
+import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginBodyJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginResponseJson;
+import techkids.vn.android7pomodoro.networks.services.GetAllTasksService;
 import techkids.vn.android7pomodoro.networks.services.LoginService;
 import techkids.vn.android7pomodoro.settings.LoginCredentials;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
@@ -112,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, String.format("onResponse, oh yeah: %s", loginResponseJson));
                             if (response.code() == 200) {
                                 token = loginResponseJson.getAccessToken();
+
                                 onLoginSuccess();
                             }
                         }
@@ -133,6 +144,8 @@ public class LoginActivity extends AppCompatActivity {
     private void onLoginSuccess() {
         SharedPrefs.getInstance().put(new LoginCredentials(username, password, token));
         Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show();
+
+        getAllTasks();
         gotoTaskActivity();
     }
 
@@ -148,6 +161,47 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TaskActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+    private void getAllTasks(){
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+
+                Request request = original.newBuilder()
+                        .header("Authorization","JWT "+SharedPrefs.getInstance().getAccessToken())
+                        .method(original.method(),original.body())
+                        .build();
+                return  chain.proceed(request);
+            }
+        });
+        OkHttpClient client = httpClient.build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://a-task.herokuapp.com/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        final GetAllTasksService getAllTasksService = retrofit.create(GetAllTasksService.class);
+        getAllTasksService.getAllTask().enqueue(new Callback<List<GetTaskResponseJson>>() {
+            @Override
+            public void onResponse(Call<List<GetTaskResponseJson>> call, Response<List<GetTaskResponseJson>> response) {
+               for(GetTaskResponseJson getTask : response.body()){
+                   Log.d(TAG, String.format("onResponse: %s",getTask ));
+                       Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour());
+
+                       if(task.getName() != null){
+                           DbContext.instance.addTask(task);
+                       }
+               }
+            }
+
+            @Override
+            public void onFailure(Call<List<GetTaskResponseJson>> call, Throwable t) {
+                Log.d(TAG, "onFailure: ");
+            }
+        });
     }
 
 }

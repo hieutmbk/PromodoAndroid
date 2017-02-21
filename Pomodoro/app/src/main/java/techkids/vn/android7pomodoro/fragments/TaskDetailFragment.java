@@ -15,14 +15,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.activities.TaskActivity;
 import techkids.vn.android7pomodoro.adapters.TaskColorAdapter;
 import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.decorations.TaskColorDecor;
+import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
+import techkids.vn.android7pomodoro.fragments.strategies.TaskAction;
+import techkids.vn.android7pomodoro.networks.jsonmodels.AddNewTaskResponeJson;
+import techkids.vn.android7pomodoro.networks.services.AddNewTaskSerVice;
+import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,15 +63,8 @@ public class TaskDetailFragment extends Fragment {
 
     private String title;
     private Task task;
-    private int selectedPosition;
 
-    public int getSelectedPosition() {
-        return selectedPosition;
-    }
-
-    public void setSelectedPosition(int selectedPosition) {
-        this.selectedPosition = selectedPosition;
-    }
+    private TaskAction taskAction;
 
     public TaskDetailFragment() {
         // Required empty public constructor
@@ -92,7 +104,7 @@ public class TaskDetailFragment extends Fragment {
         if (task != null) {
             // Edit
             etTaskName.setText(task.getName());
-            etPaymentPerHour.setText(String.format("%.1f",task.getPaymentPerHour()));
+            etPaymentPerHour.setText(String.valueOf(task.getPaymentPerHour()));
             taskColorAdapter.setSelectedColor(task.getColor());
         }
     }
@@ -113,20 +125,68 @@ public class TaskDetailFragment extends Fragment {
             String taskName = etTaskName.getText().toString();
             float paymentPerHour = Float.parseFloat(etPaymentPerHour.getText().toString());
             String color = taskColorAdapter.getSelectedColor();
-            // 2: Create new TASK
-            Task newTask = new Task(taskName, color, paymentPerHour);
 
-            if(title.equals("Add new task")) {
-                // 3: Add to database
-                DbContext.instance.addTask(newTask);
-                getActivity().onBackPressed();
-            }
-            else {
-                DbContext.instance.editTask(newTask,selectedPosition);
-                getActivity().onBackPressed();
-            }
+            if (task == null) {
+                // ADD
+                task = new Task(taskName, color, paymentPerHour);
+            } else {
+                // EDIT
+                task.setName(taskName);
+                task.setColor(color);
+                task.setPaymentPerHour(paymentPerHour);
 
+            }
+            addNewTask(task);
+            this.taskAction.excute(task);
+
+            getActivity().onBackPressed();
         }
         return false;
+    }
+
+    public void setTaskAction(TaskAction taskAction) {
+        this.taskAction = taskAction;
+    }
+
+    public void addNewTask(Task task){
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+
+                Request request = original.newBuilder()
+                        .header("Authorization","JWT "+ SharedPrefs.getInstance().getAccessToken())
+                        .method(original.method(),original.body())
+                        .build();
+                return  chain.proceed(request);
+            }
+        });
+        OkHttpClient client = httpClient.build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://a-task.herokuapp.com/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+        AddNewTaskSerVice addNewTaskSerVice = retrofit.create(AddNewTaskSerVice.class);
+        MediaType mediaTypeJson = MediaType.parse("application/json");
+        String addTaskJson = (new Gson()).toJson(new AddNewTaskResponeJson(task.getColor(),null,true,null,task.getName(),null,task.getPaymentPerHour()));
+        RequestBody addTaskBody = RequestBody.create(mediaTypeJson,addTaskJson);
+        Call<AddNewTaskResponeJson> addTaskCall = addNewTaskSerVice.addTask(addTaskBody);
+        addTaskCall.enqueue(new Callback<AddNewTaskResponeJson>() {
+            @Override
+            public void onResponse(Call<AddNewTaskResponeJson> call, Response<AddNewTaskResponeJson> response) {
+                AddNewTaskResponeJson addNewTaskResponeJson = response.body();
+                if(addNewTaskResponeJson == null){
+                    Log.d(TAG, "onResponse: Added");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AddNewTaskResponeJson> call, Throwable t) {
+
+            }
+        });
+
     }
 }

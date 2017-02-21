@@ -14,22 +14,21 @@ public class DbContext {
 
     public static final DbContext instance = new DbContext();
 
-    static ArrayList<Task> tasks;
+    ArrayList<Task> tasks ;
 
     public List<Task> allTasks() {
         //Fake data (dummy data)
         //1: Create array list
-        if (tasks == null) {
+        if(tasks == null) {
             tasks = new ArrayList<>();
 
-            //2: Add some tassk and return
-            tasks.add(new Task("Study recyclerview", TaskColor.COLORS[0], 2.3f));
-            tasks.add(new Task("Practice recyclerview", TaskColor.COLORS[1], 1.1f));
-            tasks.add(new Task("Practice networking", TaskColor.COLORS[2], 0.5f));
-            tasks.add(new Task("Party End-lectures", TaskColor.COLORS[3], 0.9f));
-            tasks.add(new Task("Study API", "#D4E157"));
+//            //2: Add some tassk and return
+//            tasks.add(new Task("Study recyclerview", TaskColor.COLORS[0], 2.3f));
+//            tasks.add(new Task("Practice recyclerview", TaskColor.COLORS[1], 1.1f));
+//            tasks.add(new Task("Practice networking", TaskColor.COLORS[2], 0.5f));
+//            tasks.add(new Task("Party End-lectures", TaskColor.COLORS[3], 0.9f));
+//            tasks.add(new Task("Study API", "#D4E157"));
         }
-
         return tasks;
     }
 
@@ -37,17 +36,7 @@ public class DbContext {
         tasks.add(newTask);
     }
 
-    public void editTask(Task newTask,int position){
-        tasks.get(position).setName(newTask.getName());
-        tasks.get(position).setColor(newTask.getColor());
-        tasks.get(position).setPaymentPerHour(newTask.getPaymentPerHour());
-    }
-    public int setPosition(Task task){
-        for(int itemIndex = 0; itemIndex < tasks.size(); itemIndex++){
-                if(task.getName().equals(tasks.get(itemIndex).getName()) && task.getColor().equals(tasks.get(itemIndex).getColor()) && (task.getPaymentPerHour() == tasks.get(itemIndex).getPaymentPerHour())){
-                return itemIndex;
-            }
-        }
-        return 0;
+    public void edit(Task task) {
+        //TODO: Edit task in database
     }
 }
