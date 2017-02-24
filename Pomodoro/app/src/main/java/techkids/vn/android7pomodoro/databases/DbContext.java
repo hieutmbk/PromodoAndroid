@@ -39,4 +39,7 @@ public class DbContext {
     public void edit(Task task) {
         //TODO: Edit task in database
     }
+    public void del(Task task){
+        tasks.remove(task);
+    }
 }

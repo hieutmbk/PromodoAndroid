@@ -33,6 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
+import techkids.vn.android7pomodoro.networks.NetContext;
 import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginBodyJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginResponseJson;
@@ -60,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        skipLoginIfPossible();
+       // skipLoginIfPossible();
 
         setContentView(R.layout.activity_login);
 
@@ -93,14 +94,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void sendLogin(String username, String password) {
         //1 : Create retrofit (BaseURL)
-        retrofit = new Retrofit.Builder()
-                .baseUrl("http://a-task.herokuapp.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        //2: Create service (Service)
-        LoginService loginService = retrofit.create(LoginService.class);
-
+         LoginService loginService = NetContext.instance.createLoginService();
         // data & format
         // format => MediaType
         // data => json
@@ -189,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<List<GetTaskResponseJson>> call, Response<List<GetTaskResponseJson>> response) {
                for(GetTaskResponseJson getTask : response.body()){
                    Log.d(TAG, String.format("onResponse: %s",getTask ));
-                       Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour());
+                       Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour(),getTask.getLocalID());
 
                        if(task.getName() != null){
                            DbContext.instance.addTask(task);

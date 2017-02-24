@@ -13,11 +13,14 @@ public class GetTaskResponseJson {
     private String color;
     @SerializedName("payment_per_hour")
     private float paymentPerHour;
+    @SerializedName("local_id")
+    private String localID;
 
-    public GetTaskResponseJson(String name, String color, float paymentPerHour) {
+    public GetTaskResponseJson(String name, String color, float paymentPerHour, String localID) {
         this.name = name;
         this.color = color;
         this.paymentPerHour = paymentPerHour;
+        this.localID = localID;
     }
 
     public String getName() {
@@ -44,12 +47,21 @@ public class GetTaskResponseJson {
         this.paymentPerHour = paymentPerHour;
     }
 
+    public String getLocalID() {
+        return localID;
+    }
+
+    public void setLocalID(String localID) {
+        this.localID = localID;
+    }
+
     @Override
     public String toString() {
         return "GetTaskResponseJson{" +
                 "name='" + name + '\'' +
                 ", color='" + color + '\'' +
                 ", paymentPerHour=" + paymentPerHour +
+                ", localID='" + localID + '\'' +
                 '}';
     }
 }

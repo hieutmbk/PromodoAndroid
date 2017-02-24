@@ -1,10 +1,12 @@
 package techkids.vn.android7pomodoro.fragments;
 
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,16 +17,24 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.content.Context;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.activities.TaskActivity;
 import techkids.vn.android7pomodoro.adapters.TaskAdapter;
+import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.fragments.strategies.AddTaskAction;
 import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
+import techkids.vn.android7pomodoro.networks.NetContext;
+import techkids.vn.android7pomodoro.networks.jsonmodels.EditTaskResponeJSon;
+import techkids.vn.android7pomodoro.networks.services.DeleteTaskService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,9 +76,10 @@ public class TaskFragment extends Fragment {
 
         taskAdapter.setTaskItemClickListener(new TaskAdapter.TaskItemClickListener() {
             @Override
-            public void onItemClick(Task task) {
+            public void onItemClick(final Task task) {
                 Log.d(TAG, String.format("onItemClick: %s", task));
                 TaskDetailFragment taskDetailFragment = new TaskDetailFragment();
+                taskDetailFragment.setLocalID(task.getLocalID());
 
                 taskDetailFragment.setTitle("Edit task");
                 taskDetailFragment.setTask(task);
@@ -76,6 +87,32 @@ public class TaskFragment extends Fragment {
 
                 //TODO: Make TaskActivity and Fragment independent
                 ((TaskActivity)getActivity()).replaceFragment(taskDetailFragment, true);
+            }
+        });
+        taskAdapter.setTaskItemLongClickListener(new TaskAdapter.TaskItemLongClickListener() {
+            @Override
+            public void onItemLongClick(final Task task) {
+                Log.d(TAG, "onItemLongClick: ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+                final AlertDialog.Builder delDialog = new AlertDialog.Builder(TaskFragment.this.getContext());
+                delDialog.setTitle("Delete?");
+                delDialog.setMessage("Are you sure you want to delete?");
+                delDialog.setPositiveButton("Yes", new DialogInterface. OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                       deleteTask(task);
+                        DbContext.instance.del(task);
+                        taskAdapter.notifyDataSetChanged();
+                    }});
+                delDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.cancel();
+                    }
+                });
+
+                delDialog.show();
             }
         });
 
@@ -86,6 +123,7 @@ public class TaskFragment extends Fragment {
                 ((TaskActivity)getActivity()).replaceFragment(new TimerFragment(), true);
             }
         });
+
 
         AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
         appCompatActivity.getSupportActionBar().setTitle(R.string.tasks);
@@ -106,5 +144,23 @@ public class TaskFragment extends Fragment {
 
         //TODO: Make TaskActivity and Fragment independent
         ((TaskActivity)getActivity()).replaceFragment(taskDetailFragment, true);
+    }
+    public void deleteTask(Task task){
+        DeleteTaskService delService = NetContext.instance.creDeleteTaskService();
+
+        delService.delTask(task.getLocalID()).enqueue(new Callback<EditTaskResponeJSon>() {
+            @Override
+            public void onResponse(Call<EditTaskResponeJSon> call, Response<EditTaskResponeJSon> response) {
+                EditTaskResponeJSon delTaskResponeJSon = response.body();
+                if (delTaskResponeJSon != null) {
+                    Log.d(TAG, String.format("onResponse: %s", delTaskResponeJSon));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<EditTaskResponeJSon> call, Throwable t) {
+
+            }
+        });
     }
 }

@@ -39,8 +39,11 @@ import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.decorations.TaskColorDecor;
 import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
 import techkids.vn.android7pomodoro.fragments.strategies.TaskAction;
+import techkids.vn.android7pomodoro.networks.NetContext;
 import techkids.vn.android7pomodoro.networks.jsonmodels.AddNewTaskResponeJson;
+import techkids.vn.android7pomodoro.networks.jsonmodels.EditTaskResponeJSon;
 import techkids.vn.android7pomodoro.networks.services.AddNewTaskSerVice;
+import techkids.vn.android7pomodoro.networks.services.EditTaskService;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
 /**
@@ -65,6 +68,15 @@ public class TaskDetailFragment extends Fragment {
     private Task task;
 
     private TaskAction taskAction;
+    private String localID;
+
+    public String getLocalID() {
+        return localID;
+    }
+
+    public void setLocalID(String localID) {
+        this.localID = localID;
+    }
 
     public TaskDetailFragment() {
         // Required empty public constructor
@@ -125,18 +137,18 @@ public class TaskDetailFragment extends Fragment {
             String taskName = etTaskName.getText().toString();
             float paymentPerHour = Float.parseFloat(etPaymentPerHour.getText().toString());
             String color = taskColorAdapter.getSelectedColor();
-
             if (task == null) {
                 // ADD
-                task = new Task(taskName, color, paymentPerHour);
+                task = new Task(taskName, color, paymentPerHour,localID);
+                addNewTask(task);
             } else {
                 // EDIT
                 task.setName(taskName);
                 task.setColor(color);
                 task.setPaymentPerHour(paymentPerHour);
-
+                editTask(task);
             }
-            addNewTask(task);
+
             this.taskAction.excute(task);
 
             getActivity().onBackPressed();
@@ -149,26 +161,7 @@ public class TaskDetailFragment extends Fragment {
     }
 
     public void addNewTask(Task task){
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-
-                Request request = original.newBuilder()
-                        .header("Authorization","JWT "+ SharedPrefs.getInstance().getAccessToken())
-                        .method(original.method(),original.body())
-                        .build();
-                return  chain.proceed(request);
-            }
-        });
-        OkHttpClient client = httpClient.build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://a-task.herokuapp.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        AddNewTaskSerVice addNewTaskSerVice = retrofit.create(AddNewTaskSerVice.class);
+        AddNewTaskSerVice addNewTaskSerVice = NetContext.instance.createAddService();
         MediaType mediaTypeJson = MediaType.parse("application/json");
         String addTaskJson = (new Gson()).toJson(new AddNewTaskResponeJson(task.getColor(),null,true,null,task.getName(),null,task.getPaymentPerHour()));
         RequestBody addTaskBody = RequestBody.create(mediaTypeJson,addTaskJson);
@@ -181,12 +174,30 @@ public class TaskDetailFragment extends Fragment {
                     Log.d(TAG, "onResponse: Added");
                 }
             }
-
             @Override
             public void onFailure(Call<AddNewTaskResponeJson> call, Throwable t) {
 
             }
         });
 
+    }
+    public void editTask(Task task){
+        EditTaskService editService = NetContext.instance.createEditService();
+        MediaType mediaTypeJson = MediaType.parse("application/json");
+        String editTaskJson = (new Gson()).toJson(new EditTaskResponeJSon(task.getColor(),null,false,task.getName(),getLocalID(),task.getPaymentPerHour()));
+        RequestBody editBody = RequestBody.create(mediaTypeJson,editTaskJson);
+        Call<EditTaskResponeJSon> editTaskCall = editService.editTask(getLocalID(),editBody);
+        editTaskCall.enqueue(new Callback<EditTaskResponeJSon>() {
+            @Override
+            public void onResponse(Call<EditTaskResponeJSon> call, Response<EditTaskResponeJSon> response) {
+                EditTaskResponeJSon editTask = response.body();
+                Log.d(TAG, String.format("onResponse: %s",editTask ));
+            }
+
+            @Override
+            public void onFailure(Call<EditTaskResponeJSon> call, Throwable t) {
+
+            }
+        });
     }
 }
