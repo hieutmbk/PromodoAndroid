@@ -60,7 +60,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     @Override
     public void onBindViewHolder(TaskViewHolder holder, final int position) {
         //1: Get data based on position
-        final Task task = DbContext.instance.allTasks().get(position);
+        final Task task = DbContext.instance.allTask().get(position);
 
         //2: Bind data into view
         holder.bind(task);
@@ -107,6 +107,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
     @Override
     public int getItemCount() {
-        return DbContext.instance.allTasks().size();
+        return DbContext.instance.allTask().size();
     }
 }

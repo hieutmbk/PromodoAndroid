@@ -19,6 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.networks.services.AddNewTaskSerVice;
 import techkids.vn.android7pomodoro.networks.services.DeleteTaskService;
 import techkids.vn.android7pomodoro.networks.services.EditTaskService;
+import techkids.vn.android7pomodoro.networks.services.GetAllTasksService;
 import techkids.vn.android7pomodoro.networks.services.LoginService;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
 
@@ -53,6 +54,9 @@ public class NetContext {
     }
     public EditTaskService createEditService(){
         return retrofit.create(EditTaskService.class);
+    }
+    public GetAllTasksService createGetTaskService(){
+        return retrofit.create(GetAllTasksService.class);
     }
     public DeleteTaskService creDeleteTaskService(){
         return retrofit.create(DeleteTaskService.class);

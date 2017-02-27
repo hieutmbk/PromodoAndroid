@@ -2,18 +2,30 @@ package techkids.vn.android7pomodoro.databases.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.UUID;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
 /**
  * Created by huynq on 2/8/17.
  */
 
-public class Task {
+public class Task extends RealmObject{
+    @PrimaryKey
+    private String id;
     private String name;
     private String color;
     private float paymentPerHour;
     private String localID;
     private boolean isDone;
 
+    public Task(){
+        this(null,null,1.1f,null);
+    }
+
     public Task(String name, String color, float paymentPerHour, String localID) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.color = color;
         this.paymentPerHour = paymentPerHour;
@@ -63,6 +75,14 @@ public class Task {
 
     public void setLocalID(String localID) {
         this.localID = localID;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

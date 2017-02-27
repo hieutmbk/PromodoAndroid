@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-       // skipLoginIfPossible();
+        //skipLoginIfPossible();
 
         setContentView(R.layout.activity_login);
 
@@ -139,7 +139,6 @@ public class LoginActivity extends AppCompatActivity {
         SharedPrefs.getInstance().put(new LoginCredentials(username, password, token));
         Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show();
 
-        getAllTasks();
         gotoTaskActivity();
     }
 
@@ -155,47 +154,6 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TaskActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-    private void getAllTasks(){
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-
-                Request request = original.newBuilder()
-                        .header("Authorization","JWT "+SharedPrefs.getInstance().getAccessToken())
-                        .method(original.method(),original.body())
-                        .build();
-                return  chain.proceed(request);
-            }
-        });
-        OkHttpClient client = httpClient.build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://a-task.herokuapp.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-
-        final GetAllTasksService getAllTasksService = retrofit.create(GetAllTasksService.class);
-        getAllTasksService.getAllTask().enqueue(new Callback<List<GetTaskResponseJson>>() {
-            @Override
-            public void onResponse(Call<List<GetTaskResponseJson>> call, Response<List<GetTaskResponseJson>> response) {
-               for(GetTaskResponseJson getTask : response.body()){
-                   Log.d(TAG, String.format("onResponse: %s",getTask ));
-                       Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour(),getTask.getLocalID());
-
-                       if(task.getName() != null){
-                           DbContext.instance.addTask(task);
-                       }
-               }
-            }
-
-            @Override
-            public void onFailure(Call<List<GetTaskResponseJson>> call, Throwable t) {
-                Log.d(TAG, "onFailure: ");
-            }
-        });
     }
 
 }

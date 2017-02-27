@@ -2,6 +2,8 @@ package techkids.vn.android7pomodoro.fragments;
 
 
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +20,9 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
+import android.widget.Toast;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,9 +37,12 @@ import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.fragments.strategies.AddTaskAction;
 import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
+import techkids.vn.android7pomodoro.networks.CheckInternet;
 import techkids.vn.android7pomodoro.networks.NetContext;
 import techkids.vn.android7pomodoro.networks.jsonmodels.EditTaskResponeJSon;
+import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
 import techkids.vn.android7pomodoro.networks.services.DeleteTaskService;
+import techkids.vn.android7pomodoro.networks.services.GetAllTasksService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,7 +109,7 @@ public class TaskFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which)
                     {
                        deleteTask(task);
-                        DbContext.instance.del(task);
+                        DbContext.instance.delete(task);
                         taskAdapter.notifyDataSetChanged();
                     }});
                 delDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -134,6 +142,11 @@ public class TaskFragment extends Fragment {
         rvTask.addItemDecoration(dividerItemDecoration);
 
         setHasOptionsMenu(true);
+
+        if(CheckInternet.isConnected(this.getContext()) == true){
+            taskAdapter.notifyDataSetChanged();
+            getAllTasks();
+        }
     }
 
     @OnClick(R.id.fab)
@@ -141,6 +154,7 @@ public class TaskFragment extends Fragment {
         TaskDetailFragment taskDetailFragment = new TaskDetailFragment();
         taskDetailFragment.setTitle("Add new task");
         taskDetailFragment.setTaskAction(new AddTaskAction());
+
 
         //TODO: Make TaskActivity and Fragment independent
         ((TaskActivity)getActivity()).replaceFragment(taskDetailFragment, true);
@@ -163,4 +177,36 @@ public class TaskFragment extends Fragment {
             }
         });
     }
+    private void getAllTasks(){
+        GetAllTasksService getAllTasksService = NetContext.instance.createGetTaskService();
+        getAllTasksService.getAllTask().enqueue(new Callback<List<GetTaskResponseJson>>() {
+            @Override
+            public void onResponse(Call<List<GetTaskResponseJson>> call, Response<List<GetTaskResponseJson>> response) {
+                for(GetTaskResponseJson getTask : response.body()){
+                    Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour(),getTask.getLocalID());
+//                        Log.d(TAG, String.format("onResponse: %s",task1 ));
+                    int d =0;
+                    if (task.getName() != null) {
+                        for (Task task1 : DbContext.instance.allTask()) {
+                            if (getTask.getName() != task1.getName()
+                                    && getTask.getColor() != task1.getColor()
+                                    && getTask.getPaymentPerHour() != task1.getPaymentPerHour()){
+                                d++;
+
+                            }
+                            if(d == DbContext.instance.allTask().size()){
+                                DbContext.instance.add(task);
+                            }
+
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<List<GetTaskResponseJson>> call, Throwable t) {
+                Log.d(TAG, "onFailure: ");
+            }
+        });
+    }
+
 }

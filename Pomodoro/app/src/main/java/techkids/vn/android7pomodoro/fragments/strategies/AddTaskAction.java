@@ -11,6 +11,6 @@ public class AddTaskAction implements TaskAction {
 
     @Override
     public void excute(Task task) {
-        DbContext.instance.addTask(task);
+        DbContext.instance.add(task);
     }
 }

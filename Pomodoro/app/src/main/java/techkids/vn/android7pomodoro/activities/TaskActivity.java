@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
@@ -29,6 +30,7 @@ import techkids.vn.android7pomodoro.R;
 import techkids.vn.android7pomodoro.adapters.TaskAdapter;
 import techkids.vn.android7pomodoro.fragments.TaskDetailFragment;
 import techkids.vn.android7pomodoro.fragments.TaskFragment;
+import techkids.vn.android7pomodoro.networks.CheckInternet;
 
 public class TaskActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -87,6 +89,14 @@ public class TaskActivity extends AppCompatActivity
         replaceFragment(new TaskFragment(), false);
 
         ButterKnife.bind(this);
+        if(CheckInternet.isConnected(this) == true){
+
+            Toast.makeText(this,"Connected Internet",Toast.LENGTH_SHORT).show();
+        }else {
+
+            Toast.makeText(this,"No Internet",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
