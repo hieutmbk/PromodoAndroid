@@ -1,12 +1,10 @@
 package techkids.vn.android7pomodoro.activities;
 
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -17,27 +15,16 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.io.IOException;
-import java.util.List;
-
-import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.android7pomodoro.R;
-import techkids.vn.android7pomodoro.databases.DbContext;
-import techkids.vn.android7pomodoro.databases.models.Task;
 import techkids.vn.android7pomodoro.networks.NetContext;
-import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginBodyJson;
 import techkids.vn.android7pomodoro.networks.jsonmodels.LoginResponseJson;
-import techkids.vn.android7pomodoro.networks.services.GetAllTasksService;
 import techkids.vn.android7pomodoro.networks.services.LoginService;
 import techkids.vn.android7pomodoro.settings.LoginCredentials;
 import techkids.vn.android7pomodoro.settings.SharedPrefs;
@@ -56,11 +43,12 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
     private String token;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        progressDialog = new ProgressDialog(LoginActivity.this);
         //skipLoginIfPossible();
 
         setContentView(R.layout.activity_login);
@@ -74,6 +62,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 attemptLogin();
+
+                progressDialog.setTitle("Login");
+                progressDialog.setMessage("Loging ....pls..wait..");
+                progressDialog.show();
             }
         });
 
@@ -89,6 +81,24 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        etUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(etUsername.length() == 0){
+                    etUsername.setError("Tên đăng nhập không được để trống");
+                }
+            }
+        });
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(etPassword.length() == 0){
+                    etPassword.setError("Mật khẩu không được để trống");
+                }
+            }
+        });
+
 
     }
 
@@ -112,6 +122,8 @@ public class LoginActivity extends AppCompatActivity {
                         LoginResponseJson loginResponseJson = response.body();
                         if (loginResponseJson == null) {
                             Log.d(TAG, "onResponse: Could not parse body");
+                            progressDialog.dismiss();
+                            etUsername.setError("Tên đăng nhập hoặc mật khẩu sai");
                         } else {
                             Log.d(TAG, String.format("onResponse, oh yeah: %s", loginResponseJson));
                             if (response.code() == 200) {
@@ -125,6 +137,8 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<LoginResponseJson> call, Throwable t) {
                         Log.d(TAG, String.format("onFailure: %s", t));
+                        Toast.makeText(LoginActivity.this,"Mất kết nối",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 });
     }

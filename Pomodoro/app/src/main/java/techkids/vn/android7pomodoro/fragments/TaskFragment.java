@@ -1,13 +1,10 @@
 package techkids.vn.android7pomodoro.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -19,8 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.Context;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -39,8 +34,7 @@ import techkids.vn.android7pomodoro.fragments.strategies.AddTaskAction;
 import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
 import techkids.vn.android7pomodoro.networks.CheckInternet;
 import techkids.vn.android7pomodoro.networks.NetContext;
-import techkids.vn.android7pomodoro.networks.jsonmodels.EditTaskResponeJSon;
-import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
+import techkids.vn.android7pomodoro.networks.jsonmodels.EditTaskBodyJSon;
 import techkids.vn.android7pomodoro.networks.services.DeleteTaskService;
 import techkids.vn.android7pomodoro.networks.services.GetAllTasksService;
 
@@ -55,6 +49,7 @@ public class TaskFragment extends Fragment {
     private TaskAdapter taskAdapter;
 
     private static String TAG = "TaskFragment";
+    ProgressDialog progressDialog;
 
 
     public TaskFragment() {
@@ -82,6 +77,10 @@ public class TaskFragment extends Fragment {
         rvTask.setAdapter(taskAdapter);
         rvTask.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Load Data");
+        progressDialog.show();
+
         taskAdapter.setTaskItemClickListener(new TaskAdapter.TaskItemClickListener() {
             @Override
             public void onItemClick(final Task task) {
@@ -100,7 +99,6 @@ public class TaskFragment extends Fragment {
         taskAdapter.setTaskItemLongClickListener(new TaskAdapter.TaskItemLongClickListener() {
             @Override
             public void onItemLongClick(final Task task) {
-                Log.d(TAG, "onItemLongClick: ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
                 final AlertDialog.Builder delDialog = new AlertDialog.Builder(TaskFragment.this.getContext());
                 delDialog.setTitle("Delete?");
                 delDialog.setMessage("Are you sure you want to delete?");
@@ -144,7 +142,6 @@ public class TaskFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if(CheckInternet.isConnected(this.getContext()) == true){
-            taskAdapter.notifyDataSetChanged();
             getAllTasks();
         }
     }
@@ -162,49 +159,43 @@ public class TaskFragment extends Fragment {
     public void deleteTask(Task task){
         DeleteTaskService delService = NetContext.instance.creDeleteTaskService();
 
-        delService.delTask(task.getLocalID()).enqueue(new Callback<EditTaskResponeJSon>() {
+        delService.delTask(task.getLocalID()).enqueue(new Callback<EditTaskBodyJSon>() {
             @Override
-            public void onResponse(Call<EditTaskResponeJSon> call, Response<EditTaskResponeJSon> response) {
-                EditTaskResponeJSon delTaskResponeJSon = response.body();
+            public void onResponse(Call<EditTaskBodyJSon> call, Response<EditTaskBodyJSon> response) {
+                EditTaskBodyJSon delTaskResponeJSon = response.body();
                 if (delTaskResponeJSon != null) {
                     Log.d(TAG, String.format("onResponse: %s", delTaskResponeJSon));
+                }else {
+                    Log.d(TAG, "Không xóa được");
                 }
             }
 
             @Override
-            public void onFailure(Call<EditTaskResponeJSon> call, Throwable t) {
-
+            public void onFailure(Call<EditTaskBodyJSon> call, Throwable t) {
+                Log.d(TAG, String.format("onFailure: %s", t));
             }
         });
     }
     private void getAllTasks(){
         GetAllTasksService getAllTasksService = NetContext.instance.createGetTaskService();
-        getAllTasksService.getAllTask().enqueue(new Callback<List<GetTaskResponseJson>>() {
+        getAllTasksService.getAllTask().enqueue(new Callback<List<Task>>() {
             @Override
-            public void onResponse(Call<List<GetTaskResponseJson>> call, Response<List<GetTaskResponseJson>> response) {
-                for(GetTaskResponseJson getTask : response.body()){
-                    Task task = new Task(getTask.getName(), getTask.getColor(), getTask.getPaymentPerHour(),getTask.getLocalID());
-//                        Log.d(TAG, String.format("onResponse: %s",task1 ));
-                    int d =0;
-                    if (task.getName() != null) {
-                        for (Task task1 : DbContext.instance.allTask()) {
-                            if (getTask.getName() != task1.getName()
-                                    && getTask.getColor() != task1.getColor()
-                                    && getTask.getPaymentPerHour() != task1.getPaymentPerHour()){
-                                d++;
+            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
 
-                            }
-                            if(d == DbContext.instance.allTask().size()){
-                                DbContext.instance.add(task);
-                            }
-
-                        }
+                for(Task task : response.body()) {
+                    if (task != null) {
+                        progressDialog.dismiss();
+                        DbContext.instance.addorUpdate(task);
+                    }else
+                    {
+                        Log.d(TAG, "Không get được Task");
                     }
                 }
             }
+
             @Override
-            public void onFailure(Call<List<GetTaskResponseJson>> call, Throwable t) {
-                Log.d(TAG, "onFailure: ");
+            public void onFailure(Call<List<Task>> call, Throwable t) {
+                Log.d(TAG, "onFailure: %s",t);
             }
         });
     }

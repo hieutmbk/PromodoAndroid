@@ -14,9 +14,13 @@ import io.realm.annotations.PrimaryKey;
 public class Task extends RealmObject{
     @PrimaryKey
     private String id;
+    @SerializedName("name")
     private String name;
+    @SerializedName("color")
     private String color;
+    @SerializedName("payment_per_hour")
     private float paymentPerHour;
+    @SerializedName("local_id")
     private String localID;
     private boolean isDone;
 

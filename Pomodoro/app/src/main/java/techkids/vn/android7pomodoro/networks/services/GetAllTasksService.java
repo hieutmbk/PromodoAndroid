@@ -4,8 +4,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
-import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
+import techkids.vn.android7pomodoro.databases.models.Task;
 
 /**
  * Created by minhh on 21/02/2017.
@@ -13,5 +12,5 @@ import techkids.vn.android7pomodoro.networks.jsonmodels.GetTaskResponseJson;
 
 public interface GetAllTasksService {
     @GET("task")
-    Call<List<GetTaskResponseJson>> getAllTask();
+    Call<List<Task>> getAllTask();
 }

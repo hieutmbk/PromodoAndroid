@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by minhh on 23/02/2017.
  */
 
-public class EditTaskResponeJSon {
+public class EditTaskBodyJSon {
     @SerializedName("color")
     private String color;
     @SerializedName("due_date")
@@ -20,7 +20,7 @@ public class EditTaskResponeJSon {
     @SerializedName("payment_per_hour")
     private float paymentPerHour;
 
-    public EditTaskResponeJSon(String color, String duedate, boolean done, String name, String localid, float paymentPerHour) {
+    public EditTaskBodyJSon(String color, String duedate, boolean done, String name, String localid, float paymentPerHour) {
         this.color = color;
         this.duedate = duedate;
         this.done = done;
@@ -79,7 +79,7 @@ public class EditTaskResponeJSon {
 
     @Override
     public String toString() {
-        return "EditTaskResponeJSon{" +
+        return "EditTaskBodyJSon{" +
                 "color='" + color + '\'' +
                 ", duedate='" + duedate + '\'' +
                 ", done=" + done +
