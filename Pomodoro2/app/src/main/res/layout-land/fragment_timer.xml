@@ -8,39 +8,36 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <techkids.vn.android7pomodoro.SquareRelativeLayout
-            android:id="@+id/squareRelativeLayout"
+        <techkids.vn.android7pomodoro.LandScapeSquareLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/landScapeSquareLayout">
             <com.github.lzyzsd.circleprogress.DonutProgress
                 android:id="@+id/donut_progress"
                 custom:donut_text_color="@color/collorTransparent"
+                android:layout_margin="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="20dp" />
+                android:layout_centerHorizontal="true" />
             <TextView
                 android:id="@+id/tv_timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-
                 android:textSize="48dp"
                 android:textColor="@color/colorPrimaryDark" />
 
-        </techkids.vn.android7pomodoro.SquareRelativeLayout>
-
+        </techkids.vn.android7pomodoro.LandScapeSquareLayout>
         <Button
-            android:id="@+id/bt_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/bt_pause"
             android:text="Pause"
-            android:layout_below="@+id/squareRelativeLayout"
-            android:layout_centerHorizontal="true" />
-
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/landScapeSquareLayout" />
     </RelativeLayout>
+
+
 </FrameLayout>

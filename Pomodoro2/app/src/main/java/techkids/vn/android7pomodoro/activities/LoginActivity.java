@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 attemptLogin();
-
                 progressDialog.setTitle("Login");
                 progressDialog.setMessage("Loging ....pls..wait..");
                 progressDialog.show();
@@ -122,7 +121,6 @@ public class LoginActivity extends AppCompatActivity {
                         LoginResponseJson loginResponseJson = response.body();
                         if (loginResponseJson == null) {
                             Log.d(TAG, "onResponse: Could not parse body");
-                            progressDialog.dismiss();
                             etUsername.setError("Tên đăng nhập hoặc mật khẩu sai");
                         } else {
                             Log.d(TAG, String.format("onResponse, oh yeah: %s", loginResponseJson));
@@ -152,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
     private void onLoginSuccess() {
         SharedPrefs.getInstance().put(new LoginCredentials(username, password, token));
         Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show();
-
+        progressDialog.dismiss();
         gotoTaskActivity();
     }
 

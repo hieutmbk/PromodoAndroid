@@ -1,5 +1,6 @@
 package techkids.vn.android7pomodoro.activities;
 
+import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -96,7 +97,6 @@ public class TaskActivity extends AppCompatActivity
 
             Toast.makeText(this,"No Internet",Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override
@@ -158,6 +158,7 @@ public class TaskActivity extends AppCompatActivity
 
     public void replaceFragment(Fragment fragment, boolean addToBackstack) {
         if (addToBackstack) {
+
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fl_main, fragment)

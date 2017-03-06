@@ -17,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,6 +32,8 @@ import techkids.vn.android7pomodoro.activities.TaskActivity;
 import techkids.vn.android7pomodoro.adapters.TaskAdapter;
 import techkids.vn.android7pomodoro.databases.DbContext;
 import techkids.vn.android7pomodoro.databases.models.Task;
+import techkids.vn.android7pomodoro.events.TimerCommand;
+import techkids.vn.android7pomodoro.events.TimerCommandEvent;
 import techkids.vn.android7pomodoro.fragments.strategies.AddTaskAction;
 import techkids.vn.android7pomodoro.fragments.strategies.EditTaskAction;
 import techkids.vn.android7pomodoro.networks.CheckInternet;
@@ -126,7 +130,12 @@ public class TaskFragment extends Fragment {
             @Override
             public void onStart(Task task) {
                 Log.d(TAG, "onStart: starting timer");
-                ((TaskActivity)getActivity()).replaceFragment(new TimerFragment(), true);
+                TimerFragment timerFragment = new TimerFragment();
+                ((TaskActivity) getActivity()).getSupportActionBar().setTitle("Timer ProgressBar");
+                ((TaskActivity)getActivity()).replaceFragment(timerFragment, true);
+
+                TimerCommandEvent event = new TimerCommandEvent(TimerCommand.START_TIMER);
+                EventBus.getDefault().post(event);
             }
         });
 
